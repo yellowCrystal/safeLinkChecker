@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Safe Link Checker Settings</title>
+  <style>
+    body {
+      width: 350px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      padding: 20px;
+      margin: 0;
+      background-color: #f7f8fa;
+      color: #333;
+    }
+    h1 {
+      font-size: 18px;
+      margin-top: 0;
+      color: #1a73e8;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 25px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #5f6368;
+    }
+    .content {
+      font-size: 13px;
+      line-height: 1.6;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    ol {
+      padding-left: 20px;
+      margin: 0;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .legend {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .legend-badge {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-right: 10px;
+      width: 50px;
+      text-align: center;
+    }
+    .safe { background-color: #e6f4ea; color: #188038; border: 1px solid #188038; }
+    .caution { background-color: #fef7e0; color: #e37400; border: 1px solid #e37400; }
+    .risky { background-color: #fce8e6; color: #d93025; border: 1px solid #d93025; }
+
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #4285f4;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .github-btn {
+      display: inline-flex;
+      align-items: center;
+      background-color: #24292e;
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+      margin-bottom: 15px;
+    }
+    .github-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      background-color: #2f363d;
+    }
+    .github-icon {
+      margin-right: 8px;
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+    .privacy-text {
+      font-size: 11px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>Safe Link Checker</h1>
+
+  <div class="section">
+    <div class="content toggle-container">
+      <span>Enable on Google Search</span>
+      <label class="switch">
+        <input type="checkbox" id="enableToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">How to Use</div>
+    <div class="content">
+      <ol>
+        <li>Perform a search on Google.</li>
+        <li>Click the <strong>'Safety Check'</strong> button next to any search result.</li>
+        <li>The result will appear as a badge: Safe, Caution, or Risky.</li>
+        <li>For 'Caution' or 'Risky' results, hover over the 'Reason' button to see why.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Result Guide</div>
+    <div class="content">
+      <div class="legend">
+        <span class="legend-badge safe">Safe</span> Generally safe to visit.
+      </div>
+      <div class="legend">
+        <span class="legend-badge caution">Caution</span> Be careful. May use URL shorteners or have other minor issues.
+      </div>
+      <div class="legend">
+        <span class="legend-badge risky">Risky</span> High risk. Avoid visiting. (e.g., no HTTPS, phishing keywords)
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="https://github.com/" target="_blank" class="github-btn">
+      <svg class="github-icon" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+      </svg>
+      View Source on GitHub
+    </a>
+    <div class="privacy-text">
+      Privacy Policy: We do not collect or store any user data.
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

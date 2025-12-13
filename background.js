@@ -23,7 +23,8 @@ function analyzeSafety(url, text) {
     }
 
     const shorteners = ['bit.ly', 'goo.gl', 'tinyurl.com', 't.co', 'is.gd', 'buff.ly', 'adf.ly', 'ow.ly', 'vo.la', 'me2.do'];
-    if (shorteners.some(s => urlObj.hostname.includes(s))) {
+    // Fix: Check for exact match or subdomain match to avoid false positives (e.g., pinterest.com containing t.co)
+    if (shorteners.some(s => urlObj.hostname === s || urlObj.hostname.endsWith('.' + s))) {
       score -= 30;
       reasons.push("Uses a URL shortener.");
     }
@@ -32,24 +33,15 @@ function analyzeSafety(url, text) {
       score -= 10;
       reasons.push("URL is unusually long.");
     }
-    if ((url.match(/-/g) || []).length > 4) {
+    if ((url.match(/-/g) || []).length > 12) {
       score -= 10;
       reasons.push("Excessive hyphens in URL.");
     }
 
     if (cleanText) {
-      const phishingKeywords = ['password', 'account', 'login', 'verify', 'update', 'confirm', 'ssn', 'bank', 'credit card', 'prize', 'winner', 'congratulations', 'urgent', 'security alert'];
-      let keywordCount = 0;
-      phishingKeywords.forEach(keyword => {
-        if (cleanText.includes(keyword)) {
-          keywordCount++;
-        }
-      });
-      if (keywordCount > 3) {
-        score -= (keywordCount * 5);
-        reasons.push(`Contains ${keywordCount} potential phishing keywords.`);
-      }
+      // Removed simple keyword-based phishing detection to reduce false positives.
       
+      // Check for password fields on insecure pages (High Risk)
       if ((cleanText.includes('type="password"') || cleanText.includes('type=\'password\'')) && urlObj.protocol !== 'https:') {
           score -= 50;
           reasons.push("Password field found on an insecure (HTTP) page.");
@@ -71,19 +63,29 @@ function analyzeSafety(url, text) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'analyzeUrlSafety') {
     const { url, buttonId } = message;
+    const controller = new AbortController();
 
-    fetch(url, {
+    const fetchPromise = fetch(url, {
       method: 'GET',
       credentials: 'omit',
       cache: 'no-store',
-      redirect: 'follow'
-    })
-    .then(response => {
+      redirect: 'follow',
+      signal: controller.signal
+    }).then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       return response.text();
-    })
+    });
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        controller.abort();
+        reject(new Error('Request timed out'));
+      }, 5000);
+    });
+
+    Promise.race([fetchPromise, timeoutPromise])
     .then(htmlText => {
       const analysis = analyzeSafety(url, htmlText);
 
@@ -96,11 +98,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     })
     .catch(error => {
-      console.warn("Fetch failed (Security/Network):", error);
+      let failureReason;
+      if (error.message === 'Request timed out' || error.name === 'AbortError') {
+        failureReason = "Analysis failed (Request timed out).";
+      } else {
+        failureReason = "Analysis failed (Access blocked by site security).";
+      }
       
-      // Analyze with no page content, but add a specific reason for the failure.
       const analysis = analyzeSafety(url, "");
-      const finalReason = "Analysis failed (Access blocked by site security). " + analysis.reason;
+      const finalReason = failureReason + " " + analysis.reason;
 
       chrome.tabs.sendMessage(sender.tab.id, {
         action: 'safetyAnalysisResult',

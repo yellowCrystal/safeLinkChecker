@@ -11,8 +11,7 @@
   ],
   "host_permissions": [
     "*://*.google.com/*",
-    "*://*.google.co.kr/*",
-    "<all_urls>"
+    "*://*.google.co.kr/*"
   ],
   "action": {
     "default_popup": "popup.html",

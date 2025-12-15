@@ -5,7 +5,6 @@
   "description": "Analyzes links for potential security risks, phishing attempts, and malicious patterns.",
   "permissions": [
     "activeTab",
-    "scripting",
     "tabs",
     "storage"
   ],
